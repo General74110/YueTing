@@ -1,7 +1,7 @@
 const { fetchAudio } = require('./fetchAudio');
 
 async function fetchNewChapters(config, meta) {
-    let skip = meta.lastSkip + 1;
+    let skip = Number(meta.lastSkip ?? -1) + 1;
     let emptyCount = 0;
     const newChapters = [];
 
