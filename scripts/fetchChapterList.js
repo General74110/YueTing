@@ -28,7 +28,7 @@ async function fetchChapterList(config) {
     // 等待 playRecordsJson 出现
     await page.waitForFunction(
         () => Array.isArray(window.playRecordsJson) && window.playRecordsJson.length > 0,
-        { timeout: 60_000 }
+        { timeout: 1800000_000 }
     );
 
     const chapters = await page.evaluate(() => {
