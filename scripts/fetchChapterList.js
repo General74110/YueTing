@@ -1,17 +1,14 @@
 const puppeteer = require('puppeteer');
 
-/**
- * 使用浏览器环境获取 playRecordsJson
- * @param {Object} config
- * @returns {Array<{tingId,title,skip,bookId}>}
- */
 async function fetchChapterList(config) {
     const url = `http://www.yuetingba.cn/book/detail/${config.bookId}/0`;
     console.log('使用浏览器获取章节列表:', url);
 
     const browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        headless: 'new'
+        headless: 'new',
+        timeout: 0,                  // launch 本身不超时
+        protocolTimeout: 180000,    // 3 分钟，增加 DevTools 通信超时
     });
 
     const page = await browser.newPage();
@@ -20,15 +17,11 @@ async function fetchChapterList(config) {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36'
     );
 
-    await page.goto(url, {
-        waitUntil: 'networkidle2',
-        timeout: 0
-    });
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
 
-    // 等待 playRecordsJson 出现
     await page.waitForFunction(
         () => Array.isArray(window.playRecordsJson) && window.playRecordsJson.length > 0,
-        { timeout: 1800000_000 }
+        { timeout: 180_000 } // 保留 waitForFunction 超时
     );
 
     const chapters = await page.evaluate(() => {
