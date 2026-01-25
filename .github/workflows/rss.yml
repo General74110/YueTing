@@ -16,15 +16,12 @@ jobs:
         with:
           node-version: 18
 
-      # 安装依赖（node-fetch + axios）
       - name: 安装依赖
-        run: npm install axios node-fetch@2
+        run: npm install
 
-      # 运行脚本
-      - name: 生成 RSS
+      - name: 运行脚本
         run: node index.js
 
-      # Push 到 master
       - name: Push RSS
         run: |
           git config user.name "github-actions"

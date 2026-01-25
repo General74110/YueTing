@@ -1,51 +1,28 @@
 const fetch = require('node-fetch');
 
-async function fetchChapterList(config, retries = 3) {
-    const url = `http://www.yuetingba.cn/book/detail/${config.bookId}/0`;
+/**
+ * 从悦听吧章节列表 JSON 接口获取全量章节
+ */
+async function fetchChapterList(config) {
+    // 这里替换为真实抓包得到的章节列表接口
+    const url = `http://36.5.86.89:52001/chapters?bookId=${config.bookId}`;
     console.log('获取章节列表:', url);
 
-    let html = '';
-    // 尝试抓取最大重试次数
-    while (retries > 0) {
-        try {
-            // 发起请求并获取 HTML
-            html = await fetch(url, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0',
-                    'Accept': 'text/html'
-                }
-            }).then(r => r.text());
+    const res = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+    });
 
-            // 打印前1000个字符，确保能看到 playRecordsJson
-            console.log(html.substring(0, 1000));
+    if (!res.ok) throw new Error(`请求章节列表失败: ${res.status}`);
 
-            // 查找 playRecordsJson
-            const match = html.match(/var\s+playRecordsJson\s*=\s*(\[[\s\S]*?\]);/);
-            if (match) break;
+    const data = await res.json();
 
-            // 如果没有找到 playRecordsJson，重试
-            retries--;
-            console.log(`未找到 playRecordsJson，重试 ${3 - retries} 次`);
-        } catch (err) {
-            retries--;
-            console.error(`错误: ${err.message}，重试 ${3 - retries} 次`);
-        }
-    }
+    if (!data || !data.data) throw new Error('章节列表 JSON 不正确');
 
-    // 如果重试次数用完，还没找到 playRecordsJson，抛出错误
-    if (retries === 0) {
-        throw new Error('未找到 playRecordsJson');
-    }
-
-    // 提取并解析 playRecordsJson
-    const list = JSON.parse(html.match(/var\s+playRecordsJson\s*=\s*(\[[\s\S]*?\]);/)[1]);
-
-    // 返回一个包含章节信息的数组
-    return list.map(item => ({
+    return data.data.map(item => ({
         tingId: item.tingId,
-        title: item.tingTitle,
-        skip: Number(item.skip),
-        bookId: item.bookId
+        title: item.title || item.tingTitle,
+        skip: item.skip ?? 0,
+        bookId: config.bookId
     }));
 }
 

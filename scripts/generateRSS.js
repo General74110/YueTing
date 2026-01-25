@@ -1,26 +1,25 @@
 const fs = require('fs');
+const { create } = require('xmlbuilder2');
 
-function generateRSS(meta, config, output) {
-    const items = meta.chapters.map(c => `
-  <item>
-    <title>${c.title}</title>
-    <enclosure url="${c.audio}" type="audio/mpeg"/>
-    <guid>${c.id}</guid>
-    <pubDate>${c.pubDate}</pubDate>
-  </item>
-  `).join('');
+function generateRSS(meta, novelDir) {
+    const feed = create({ version: '1.0', encoding: 'UTF-8' })
+        .ele('rss', { version: '2.0' })
+        .ele('channel')
+        .ele('title').txt(meta.title).up()
+        .ele('link').txt(`http://www.yuetingba.cn/book/detail/${meta.id}/0`).up()
+        .ele('description').txt(`主播: ${meta.speaker || '未知'}`).up();
 
-    const rss = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-<channel>
-  <title>${config.title}</title>
-  <description>${config.author} - ${config.speaker}</description>
-  <link>http://www.yuetingba.cn</link>
-  ${items}
-</channel>
-</rss>`;
+    meta.chapters.forEach(ch => {
+        feed.ele('item')
+            .ele('title').txt(ch.title).up()
+            .ele('enclosure', { url: ch.audioUrl, type: 'audio/mpeg' }).up()
+            .ele('guid').txt(ch.tingId).up()
+            .ele('pubDate').txt(new Date().toUTCString()).up()
+            .up();
+    });
 
-    fs.writeFileSync(output, rss);
+    const xml = feed.end({ prettyPrint: true });
+    fs.writeFileSync(`${novelDir}/feed.xml`, xml);
 }
 
-module.exports = { generateRSS };
+module.exports = generateRSS;

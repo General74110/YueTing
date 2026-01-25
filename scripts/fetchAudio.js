@@ -20,19 +20,12 @@ async function fetchAudio({ bookId, tingId, title }) {
 
     const json = await res.json();
 
-    if (!json || !json.data) return null;
-
-    const audioPath =
-        json.data.filePath ||
-        json.data.audio ||
-        json.data.url;
+    const audioPath = json?.data?.filePath || json?.data?.audio || json?.data?.url;
 
     if (!audioPath) return null;
 
     return {
-        url: audioPath.startsWith('http')
-            ? audioPath
-            : `http://185.242.234.59:36512${audioPath}`
+        url: audioPath.startsWith('http') ? audioPath : `http://185.242.234.59:36512${audioPath}`
     };
 }
 
