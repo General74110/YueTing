@@ -1,17 +1,39 @@
-const axios = require('axios');
+const fetch = require('node-fetch');
 
-async function fetchAudio(playUrl) {
-    const res = await axios.get(playUrl, {
+async function fetchAudio({ bookId, tingId, title }) {
+    const res = await fetch('http://36.5.86.89:52001/plays/create', {
+        method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
+            'Origin': 'http://www.yuetingba.cn',
+            'Referer': 'http://www.yuetingba.cn/',
             'User-Agent': 'Mozilla/5.0'
         },
-        timeout: 15000
+        body: JSON.stringify({
+            bookId,
+            tingId,
+            tingTitle: title,
+            position: 0,
+            isNew: false
+        })
     });
 
-    const match = res.data.match(/https?:\/\/[^"' ]+\.mp3/);
-    if (!match) return null;
+    const json = await res.json();
 
-    return decodeURI(match[0]);
+    if (!json || !json.data) return null;
+
+    const audioPath =
+        json.data.filePath ||
+        json.data.audio ||
+        json.data.url;
+
+    if (!audioPath) return null;
+
+    return {
+        url: audioPath.startsWith('http')
+            ? audioPath
+            : `http://185.242.234.59:36512${audioPath}`
+    };
 }
 
-module.exports = { fetchAudio };
+module.exports = fetchAudio;
