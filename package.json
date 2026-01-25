@@ -1,10 +1,10 @@
 {
-  "name": "YueTing",
+  "name": "yuetingba-podcast",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "private": true
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer": "^22.7.0",
+    "node-fetch": "^2.6.12",
+    "xmlbuilder2": "^3.1.1"
+  }
 }

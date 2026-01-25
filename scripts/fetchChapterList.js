@@ -1,29 +1,49 @@
-const fetch = require('node-fetch');
+const puppeteer = require('puppeteer');
 
 /**
- * 从悦听吧章节列表 JSON 接口获取全量章节
+ * 使用浏览器环境获取 playRecordsJson
+ * @param {Object} config
+ * @returns {Array<{tingId,title,skip,bookId}>}
  */
 async function fetchChapterList(config) {
-    // 这里替换为真实抓包得到的章节列表接口
-    const url = `http://36.5.86.89:52001/chapters?bookId=${config.bookId}`;
-    console.log('获取章节列表:', url);
+    const url = `http://www.yuetingba.cn/book/detail/${config.bookId}/0`;
+    console.log('使用浏览器获取章节列表:', url);
 
-    const res = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: 'new'
     });
 
-    if (!res.ok) throw new Error(`请求章节列表失败: ${res.status}`);
+    const page = await browser.newPage();
 
-    const data = await res.json();
+    await page.setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+    );
 
-    if (!data || !data.data) throw new Error('章节列表 JSON 不正确');
+    await page.goto(url, {
+        waitUntil: 'networkidle2',
+        timeout: 0
+    });
 
-    return data.data.map(item => ({
-        tingId: item.tingId,
-        title: item.title || item.tingTitle,
-        skip: item.skip ?? 0,
-        bookId: config.bookId
-    }));
+    // 等待 playRecordsJson 出现
+    await page.waitForFunction(
+        () => Array.isArray(window.playRecordsJson) && window.playRecordsJson.length > 0,
+        { timeout: 60_000 }
+    );
+
+    const chapters = await page.evaluate(() => {
+        return window.playRecordsJson.map(item => ({
+            tingId: item.tingId,
+            title: item.tingTitle,
+            skip: Number(item.skip),
+            bookId: item.bookId
+        }));
+    });
+
+    await browser.close();
+
+    console.log(`获取到章节数: ${chapters.length}`);
+    return chapters;
 }
 
 module.exports = fetchChapterList;
