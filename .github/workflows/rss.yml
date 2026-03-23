@@ -57,6 +57,7 @@ jobs:
           CONTENT_SELECTOR: ${{ inputs.content_selector }}
           TTS_ENGINE: ${{ inputs.tts_engine }}
           AUDIO_BASE: https://raw.githubusercontent.com/${{ github.repository }}/master
+          NO_BROWSER: 1
         run: node index.js
 
       - name: Push RSS
