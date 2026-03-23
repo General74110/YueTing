@@ -4,6 +4,33 @@ on:
   schedule:
     - cron: '0 */6 * * *'
   workflow_dispatch:
+    inputs:
+      site:
+        description: '站点: yuetingba / generic'
+        required: false
+        default: 'yuetingba'
+      title:
+        description: '小说标题'
+        required: false
+      author:
+        description: '作者'
+        required: false
+      speaker:
+        description: '播音或TTS Voice'
+        required: false
+      start_url:
+        description: '通用站点目录页 URL'
+        required: false
+      list_selector:
+        description: '章节列表选择器'
+        required: false
+      content_selector:
+        description: '正文选择器'
+        required: false
+      tts_engine:
+        description: 'edge | gtts'
+        required: false
+        default: 'edge'
 
 jobs:
   build:
@@ -20,6 +47,16 @@ jobs:
         run: npm install
 
       - name: 运行脚本
+        env:
+          SITE: ${{ inputs.site }}
+          TITLE: ${{ inputs.title }}
+          AUTHOR: ${{ inputs.author }}
+          SPEAKER: ${{ inputs.speaker }}
+          START_URL: ${{ inputs.start_url }}
+          LIST_SELECTOR: ${{ inputs.list_selector }}
+          CONTENT_SELECTOR: ${{ inputs.content_selector }}
+          TTS_ENGINE: ${{ inputs.tts_engine }}
+          AUDIO_BASE: https://raw.githubusercontent.com/${{ github.repository }}/master
         run: node index.js
 
       - name: Push RSS

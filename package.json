@@ -3,8 +3,16 @@
   "version": "1.0.0",
   "type": "commonjs",
   "dependencies": {
-    "puppeteer": "^22.7.0",
+    "axios": "^1.6.8",
+    "edge-tts": "^1.0.1",
+    "gtts": "^0.2.1",
+    "minimist": "^1.2.8",
     "node-fetch": "^2.6.12",
+    "node-telegram-bot-api": "^0.66.0",
+    "node-html-parser": "^7.0.0",
+    "puppeteer": "^22.7.0",
+    "sharp": "^0.33.2",
+    "uuid": "^9.0.1",
     "xmlbuilder2": "^3.1.1"
   }
 }

@@ -9,13 +9,12 @@
 ## ✨ 功能特性
 
 - ✅ **1 本小说 = 1 个播客 RSS**
-- ✅ 自动抓取播放页中的 **直链 MP3**
-- ✅ 首次运行全量生成
-- ✅ 后续运行 **仅追加新章节（增量）**
-- ✅ 连载 / 完本自动识别
-- ✅ 无需登录、无需破解、无需浏览器
-- ✅ 适用于 **Apple Podcast / Pocket Casts / 小宇宙**
-- ✅ GitHub Actions 定时自动更新
+- ✅ 自动抓取悦听吧播放页直链 MP3（默认）
+- ✅ 新增：通用站点模式（传入目录页 + CSS 选择器，抓正文 → 多 TTS 合成音频）
+- ✅ 新增：自动封面 (PNG) + RSS `itunes:image`，Apple Podcasts 可直接订阅
+- ✅ 新增：Telegram Bot 触发 GitHub Actions，输入小说名/URL 即可生成
+- ✅ 首次全量生成，后续仅追加新章节（增量）
+- ✅ 支持定时（schedule）和手动 workflow_dispatch
 
 ---
 
